@@ -1,0 +1,50 @@
+name: Build Tauri App
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build-tauri:
+    name: Test application
+    runs-on: windows-latest
+
+    defaults:
+      run:
+        working-directory: program
+
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v3
+
+      - name: 🦀 Install Rust toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+          override: true
+
+      - name: 🧰 Install Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: 📦 Install dependencies
+        run: npm install
+
+      - name: 📦 Cache Cargo registry + build
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/bin
+            ~/.cargo/git
+            target
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-
+
+      - name: ✅ Run Tauri tests
+        run: cargo test
+        working-directory: ./program/src-tauri

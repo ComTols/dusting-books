@@ -1,0 +1,117 @@
+name: Release Tauri App (Windows)
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  release:
+    name: Build and create GitHub Release
+    runs-on: windows-latest
+
+    defaults:
+      run:
+        working-directory: program
+        shell: pwsh
+
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: 🏷️ Calculate next version
+        id: version
+        run: |
+          $tags = git tag --list 'v*' | Sort-Object -Descending
+          echo $tags
+          if (-not $tags) {
+            $version = "v1.0.0"
+          } else {
+            $last = $tags[0]
+            echo $last
+            if ($last -match '^v(\d+)\.(\d+)\.(\d+)$') {
+              $major = $matches[1]
+              $minor = [int]$matches[2] + 1
+              $version = "v$major.$minor.0"
+            } else {
+              echo "Unexpected version format: $last"
+              $version = "v1.0.0"
+            }
+          }
+          "VERSION=$version" >> $env:GITHUB_OUTPUT
+
+      - name: 🦀 Install Rust toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+          override: true
+
+      - name: 🧰 Install Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: 📦 Install dependencies
+        run: npm install
+
+      - name: 📦 Cache Cargo registry + build
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/bin
+            ~/.cargo/git
+            target
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-
+
+      - name: 🧱 Install Tauri CLI
+        run: cargo install tauri-cli
+        continue-on-error: true
+
+      - name: 🛠 Install NSIS
+        run: choco install nsis -y
+
+      - name: 🚀 Build Tauri app
+        run: cargo tauri build
+
+      - name: 📤 Upload Installer Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-installer
+          path: program/src-tauri/target/release/bundle/nsis/*.exe
+
+      - name: 🧾 Get PR description
+        id: pr_body
+        run: |
+          $prJson = gh pr list --state merged --limit 1 --json body | ConvertFrom-Json
+          if ($prJson.Count -eq 0 -or !$prJson[0].body) {
+            $body = "Release ohne PR-Beschreibung."
+          } else {
+            $body = $prJson[0].body
+          }
+      
+          "`nBODY<<EOF`n$body`nEOF" >> $env:GITHUB_OUTPUT
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 🧾 Rename installer with version
+        shell: pwsh
+        continue-on-error: true
+        run: |
+          $version = "${{ steps.version.outputs.VERSION }}"
+          Rename-Item "./src-tauri/target/release/bundle/nsis/Dusting Books_0.10_x64-setup.exe" "dusting-books_${version}_x64_windows-installer.exe"
+
+      - name: 🚀 Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.version.outputs.VERSION }}
+          name: Release ${{ steps.version.outputs.VERSION }}
+          body: ${{ steps.pr_body.outputs.BODY }}
+          files: ./program/src-tauri/target/release/bundle/**/*.*
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
