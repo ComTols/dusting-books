@@ -1,0 +1,37 @@
+document = { SOI ~ (preamble_def | string_def | comment_def | entry_def)* ~ EOI }
+
+preamble_def = { preamble_keyword ~ "{" ~ decorated_value ~ "}" }
+preamble_keyword = @{ "@" ~ ^"preamble"}
+
+string_def = { string_keyword ~ "{" ~ key_value_list ~ "}" }
+string_keyword = @{ "@" ~ ^"string" }
+
+comment_def = { comment_keyword ~ "{" ~ decorated_value ~ "}" }
+comment_keyword = { "@" ~ ^"comment" }
+
+entry_def = { entry_keyword ~ "{" ~ entry_id ~ key_value_list ~ "}" }
+entry_keyword = ${ "@" ~ entry_keyword_inner }
+entry_keyword_inner = @{ ASCII_ALPHA+ }
+
+entry_id = ${ key ~ ","}
+
+key_value_list = { key_value_pair ~ ("," ~ key_value_pair)* ~ ("," | &"}") }
+key_value_pair = { key ~ "=" ~ decorated_value}
+
+decorated_value = { wrapped_value_braked | concatenated_value }
+key = @{ ASCII_ALPHA ~ ASCII_ALPHANUMERIC* }
+
+wrapped_value_quotes = ${ "\"" ~ wrapped_value_quotes_inner ~ "\"" }
+wrapped_value_quotes_inner = ${ (escaped_quote | unescaped_char_quote)* }
+wrapped_value_braked = ${ "{" ~ wrapped_value_braked_inner ~ "}" }
+wrapped_value_braked_inner = ${ (escaped_braked | unescaped_char_braked)*}
+concatenated_value = { (wrapped_value_quotes | key) ~ ("#" ~ (wrapped_value_quotes | key))* }
+
+escaped_quote = { "\\" ~ "\"" }
+escaped_braked = { "\\" ~ "}" }
+unescaped_char_quote = { !( "\"" | "\\" ) ~ ANY | "\\" ~ ANY }
+unescaped_char_braked = { !( "}" | "\\" ) ~ ANY | "\\" ~ ANY }
+
+
+WHITESPACE = _{ "\n" | " " | "\r" | "\t" }
+COMMENT = _{ "%" ~ (!("\n") ~ ANY)* ~ ("\n" | EOI ) }

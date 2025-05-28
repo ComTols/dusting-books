@@ -1,0 +1,11 @@
+[package]
+name = "bibtex_parser"
+version = "0.1.0"
+edition = "2024"
+
+[lib]
+name = "bibtex_parser_lib"
+
+[dependencies]
+pest = "2.7"
+pest_derive = "2.7"
