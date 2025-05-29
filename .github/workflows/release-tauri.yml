@@ -25,12 +25,10 @@ jobs:
         id: version
         run: |
           $tags = git tag --list 'v*' | Sort-Object -Descending
-          echo $tags
           if (-not $tags) {
             $version = "v1.0.0"
           } else {
             $last = $tags[0]
-            echo $last
             if ($last -match '^v(\d+)\.(\d+)\.(\d+)$') {
               $major = $matches[1]
               $minor = [int]$matches[2] + 1
@@ -40,6 +38,7 @@ jobs:
               $version = "v1.0.0"
             }
           }
+          echo "New Version: $version"
           "VERSION=$version" >> $env:GITHUB_OUTPUT
 
       - name: 🦀 Install Rust toolchain
@@ -99,12 +98,20 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: 🧾 Rename installer with version
+      - name: 🧾 Rename NSIS installer dynamically
         shell: pwsh
         continue-on-error: true
         run: |
           $version = "${{ steps.version.outputs.VERSION }}"
-          Rename-Item "./src-tauri/target/release/bundle/nsis/Dusting Books_0.10_x64-setup.exe" "dusting-books_${version}_x64_windows-installer.exe"
+          $dir = "./program/src-tauri/target/release/bundle/nsis"
+          $installer = Get-ChildItem -Path $dir -Filter *.exe | Select-Object -First 1
+
+          if ($null -eq $installer) {
+            throw "Keine .exe-Datei im NSIS-Ordner gefunden!"
+          }
+
+          $newName = "dusting-books_${version}_x64_windows-installer.exe"
+          Rename-Item -Path $installer.FullName -NewName $newName
 
       - name: 🚀 Create GitHub Release
         uses: softprops/action-gh-release@v2
