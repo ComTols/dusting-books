@@ -2,6 +2,14 @@
 Ein Programm zur einfachen Verwaltung von Literatur und Quellen für LaTeX Projekte.
 Dusting Books zeichnet sich durch seine vielen Schnittstellen und maximale Anpassbarkeit aus.
 
+# Dev Setup
+Zum Entwickeln muss sowohl der Node.js Server laufen, als auch das Tauri Backend. Es wird später zu einem Programm zusammengefügt.
+
+- Im Ordner `/program` führe `npm install` aus, um die Pakete zu installieren.
+- Im Ordner `/program` führe `npm run start` aus, das Frontend zu hosten.
+- Starte `/program/src-tauri/src/main.rs`. Achte darauf, dass das Arbeitsverzeichnis in `program/src-tauri` liegen muss!
+- 
+
 # Features
 Folgende Features werden unterstützt (werden):
 - [ ] Bibliotheken zum serialisieren und deserialisieren von `.bib` Dateien
