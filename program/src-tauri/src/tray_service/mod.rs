@@ -53,8 +53,7 @@ impl TrayService {
                 button: MouseButton::Left,
                 ..
             } => {
-                println!("Double clicked!");
-                MainWindow::default().build(app.app_handle()).unwrap()
+                MainWindow::default().open(app.app_handle()).unwrap()
             }
             _ => {}
         }
