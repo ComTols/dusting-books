@@ -5,7 +5,7 @@ use crate::models::document::Document;
 
 mod parser;
 mod errors;
-mod models;
+pub mod models;
 
     pub fn deserialize_file(path: &str) -> Result<Document, DustyError> {
         let payload = match read_to_string(path) {

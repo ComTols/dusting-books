@@ -1,5 +1,10 @@
 use serde::Deserialize;
 use std::collections::HashMap;
+use std::fmt::Display;
+use std::fs;
+use std::path::PathBuf;
+
+use crate::errors::{DustyError, DustyResult};
 
 #[derive(Debug, Deserialize)]
 pub struct Validator {
@@ -145,4 +150,27 @@ enum AppendOptions {
     /// Extends this element.
     /// If the field is already defined in this element, it will be overwritten.
     Override
+}
+
+impl Validator {
+    pub(crate) fn from_file(path: PathBuf) -> DustyResult<Validator> {
+        let contents = match fs::read_to_string(path) {
+            Ok(contents) => contents,
+            Err(e) => return Err(DustyError::LoadingError(e)),
+        };
+        
+        let validator: Self = match serde_yaml::from_str(contents.as_str()) {
+            Ok(validator) => validator,
+            Err(e) => return Err(DustyError::ParsingError(e)),
+        };
+        
+        
+        Ok(validator)
+    }
+}
+
+impl Display for Validator {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{} {}", self.name, self.version)
+    }
 }

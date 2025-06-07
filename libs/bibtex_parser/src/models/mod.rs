@@ -8,7 +8,7 @@ pub(crate) mod preamble;
 pub(crate) mod entry;
 pub(crate) mod value;
 pub(crate) mod key_value;
-pub(crate) mod document;
+pub mod document;
 
 #[derive(Debug)]
 pub struct StringDef(pub(crate) KeyValueList);
