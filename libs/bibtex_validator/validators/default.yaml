@@ -1,2 +1,41 @@
 name: Bibtex
 version: v0.1.0
+
+elements:
+  article:
+    required:
+      - condition: AllOf
+        fields:
+          title:
+          journal:
+          year:
+            data_type:
+              type: number
+    optional:
+      - condition: AllOf
+        fields:
+          volume:
+            data_type:
+              type: number
+          number:
+            data_type:
+              type: number
+          pages:
+          month:
+          note:
+  book:
+    required:
+    optional:
+      - condition: AllOf
+        fields:
+          year:
+          title:
+          publisher:
+          address:
+
+global_required_fields:
+  author:
+    data_type:
+      type: list
+      value:
+        separator: "and"

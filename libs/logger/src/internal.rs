@@ -5,6 +5,7 @@ use std::path::Path;
 use std::sync::Mutex;
 
 use chrono::Local;
+use colored::Colorize;
 use once_cell::sync::Lazy;
 
 #[derive(PartialEq, PartialOrd, Debug)]
@@ -38,9 +39,9 @@ impl Logger {
             .create(true)
             .append(true)
             .open(log_path)
-            .expect("Konnte Log-Datei nicht öffnen");
+            .expect("unable to open log file");
 
-        let level = match env::var("LOG_LEVEL").unwrap_or_default().to_lowercase().as_str() {
+        let level = match env::var("DUSTY_LOG_LEVEL").unwrap_or_default().to_lowercase().as_str() {
             "debug" => LogLevel::Debug,
             "info" => LogLevel::Info,
             "warn" => LogLevel::Warn,
@@ -71,7 +72,13 @@ impl Logger {
             let _ = writeln!(file, "{}", formatted);
         }
 
-        println!("{}", formatted);
+        match level {
+            LogLevel::Debug => println!("{}", formatted.green()),
+            LogLevel::Info => println!("{}", formatted),
+            LogLevel::Warn => println!("{}", formatted.yellow()),
+            LogLevel::Error => println!("{}", formatted.red()),
+            LogLevel::Panic => println!("{}", formatted.black().on_red()),
+        }
 
         if level == LogLevel::Panic {
             panic!("{}", message);
