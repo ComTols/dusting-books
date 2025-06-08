@@ -4,12 +4,10 @@ use std::path::{Path, PathBuf};
 use std::sync::{LazyLock, Mutex};
 use bibtex_parser_lib::models::document::Document;
 use logger::*;
-use crate::errors::{DustyResult};
+use dusty_errors::{DustyResult};
 use crate::models::{report::Report, validator::Validator};
 
 mod models;
-pub(crate) mod errors;
-mod globals;
 
 pub static VALIDATORS : LazyLock<Mutex<Vec<Validator>>> = LazyLock::new(|| {Mutex::new(load_validators(None))});
 

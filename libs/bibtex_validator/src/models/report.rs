@@ -14,20 +14,20 @@ pub struct Report {
 }
 
 #[derive(Debug, Deserialize, Clone)]
-struct Finding {
+pub(crate) struct Finding {
     /// Weather the finding was automatically corrected, needs the users attention or breaks the validation
-    level: FindingLevel,
+    pub(crate) level: FindingLevel,
     /// The unique key of the element in witch the finding occurred
-    element_key: String,
+    pub(crate) element_key: String,
     /// The unique key of the field in the element in witch the finding occurred
-    field_key: String,
+    pub(crate) field_key: String,
     /// The message code related to the failed condition. Can be shown as a translated message to the user
-    message_code: MessageCode,
+    pub(crate) message_code: MessageCode,
 }
 
 #[derive(Debug, Deserialize, Clone)]
 #[serde(untagged)]
-enum FindingLevel {
+pub(crate) enum FindingLevel {
     /// The finding was automatically corrected
     Corrected,
     /// The finding needs the users attention
@@ -38,8 +38,8 @@ enum FindingLevel {
 
 #[derive(Debug, Deserialize, Clone)]
 #[serde(untagged)]
-enum MessageCode {
-
+pub(crate) enum MessageCode {
+    LogicalValidationError,
 }
 
 impl Display for MessageCode {
@@ -63,5 +63,9 @@ impl Report {
             validator_name: validator.name.clone(),
             validator_version: validator.version.clone(),
         }
+    }
+    
+    pub(crate) fn push_finding(&mut self, finding: Finding) {
+        self.findings.push(finding);
     }
 }

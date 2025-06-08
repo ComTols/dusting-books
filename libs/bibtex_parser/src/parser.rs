@@ -1,4 +1,3 @@
-use crate::errors::{DustyError, ErrorStack};
 use crate::models::entry::Entry;
 use crate::models::key_value::KeyValueList;
 use crate::models::preamble::Preamble;
@@ -7,23 +6,27 @@ use crate::models::{Comment, document::Document, Element, StringDef};
 use pest::iterators::{Pair, Pairs};
 use pest::Parser;
 use pest_derive::Parser;
+use dusty_errors::{DustyResult, DustyError};
+use crate::errors::ErrorStack;
 
 #[derive(Parser)]
 #[grammar = "bibtex.pest"]
 pub struct BibtexParser;
 
-pub fn parse(input: &str) -> Result<Document, DustyError> {
+pub fn parse(input: &str) -> DustyResult<Document> {
     let pairs = match BibtexParser::parse(Rule::document, input) {
         Ok(pairs) => pairs,
-        Err(e) => return Err(DustyError::ParsingError(e)),
+        Err(e) => return Err(DustyError::BibtexParsingError(e.to_string())),
     };
 
     let res = match handle_document(pairs) {
         Ok(res) => res,
         Err(e) => {
-            return Err(DustyError::BuildError(e))
+            return Err(DustyError::BuildError(e.to_string()))
         },
     };
+    
+    res.valid()?;
 
     Ok(res)
 }

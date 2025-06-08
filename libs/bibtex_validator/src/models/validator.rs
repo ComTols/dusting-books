@@ -4,8 +4,8 @@ use std::fs;
 use std::path::PathBuf;
 use serde::Deserialize;
 use bibtex_parser_lib::models::document::Document;
-use crate::errors::{DustyError, DustyResult};
-use crate::models::report::Report;
+use dusty_errors::{DustyError, DustyResult};
+use crate::models::report::{Report};
 
 #[derive(Debug, Deserialize, Clone)]
 pub struct Validator {
@@ -163,15 +163,24 @@ impl Validator {
 
         let validator: Self = match serde_yaml::from_str(contents.as_str()) {
             Ok(validator) => validator,
-            Err(e) => return Err(DustyError::ParsingError(e)),
+            Err(e) => return Err(DustyError::ValidatorParsingError(e)),
         };
 
 
         Ok(validator)
     }
     
-    pub(crate) fn validate(&self, _document: &Document) -> DustyResult<Report> {
-        Ok(Report::from_validation(self))
+    pub(crate) fn validate(&self, document: &Document) -> DustyResult<Report> {
+        let mut report = Report::from_validation(self);
+        
+        for element in document.0.iter() {
+            match element { 
+                
+                _ => {}
+            }
+        }
+        
+        Ok(report)
     }
 }
 

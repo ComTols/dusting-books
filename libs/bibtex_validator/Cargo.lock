@@ -27,6 +27,7 @@ checksum = "ace50bade8e6234aa140d9a2f552bbee1db4d353f69b8217bc503490fc1a9f26"
 name = "bibtex_parser"
 version = "0.1.0"
 dependencies = [
+ "dusty_errors",
  "pest",
  "pest_derive",
 ]
@@ -36,6 +37,7 @@ name = "bibtex_validator"
 version = "0.1.0"
 dependencies = [
  "bibtex_parser",
+ "dusty_errors",
  "logger",
  "serde",
  "serde_yaml",
@@ -128,6 +130,13 @@ checksum = "9ed9a281f7bc9b7576e61468ba615a66a5c8cfdff42420a70aa82701a3b1e292"
 dependencies = [
  "block-buffer",
  "crypto-common",
+]
+
+[[package]]
+name = "dusty_errors"
+version = "0.1.0"
+dependencies = [
+ "serde_yaml",
 ]
 
 [[package]]

@@ -9,3 +9,4 @@ name = "bibtex_parser_lib"
 [dependencies]
 pest = "2.7"
 pest_derive = "2.7"
+dusty_errors = {path = "../dusty_errors"}

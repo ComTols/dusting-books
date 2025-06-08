@@ -6,10 +6,13 @@
       <sourceFolder url="file://$MODULE_DIR$/libs/bibtex_validator/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/program/src-tauri/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/libs/logger/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/libs/dusty_errors/src" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/libs/bibtex_parser/target" />
       <excludeFolder url="file://$MODULE_DIR$/libs/bibtex_validator/target" />
       <excludeFolder url="file://$MODULE_DIR$/program/src-tauri/target" />
       <excludeFolder url="file://$MODULE_DIR$/libs/logger/target" />
+      <excludeFolder url="file://$MODULE_DIR$/libs/dusty_errors/target" />
+      <excludeFolder url="file://$MODULE_DIR$/program/src-tauri/gen/schemas" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
